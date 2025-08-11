@@ -452,7 +452,7 @@ def process_vehicle_data_common(df, output_dir, data_name):
     return total_objects, total_tracking_rows
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Vehicle data preprocessing script")
+    parser = argparse.ArgumentParser(description="Pedestrian data preprocessing script")
     
     # 데이터 소스 선택
     parser.add_argument("--source", type=str, required=True, 
@@ -470,41 +470,46 @@ if __name__ == "__main__":
                        help="Directory containing JSON files (required when source=json)")
     
     # MongoDB 관련 인자
-    parser.add_argument("--start_date", type=str, 
-                       help="Start date (YYYY-MM-DD format, optional)")
-    parser.add_argument("--end_date", type=str, 
-                       help="End date (YYYY-MM-DD format, optional)")
+    parser.add_argument("--start_date", type=str,
+                       help="Start date (YYYY-MM-DD format)")
+    parser.add_argument("--end_date", type=str,
+                       help="End date (YYYY-MM-DD format)")
     parser.add_argument("--site_id", type=str, 
-                       help="Site ID filter (optional)")
+                       help="Site ID filter")
     
     args = parser.parse_args()
+
+    total_objects = 0
+    total_tracking_rows = 0
+
+    if args.source == "json":
+        if not args.json_dir:
+            parser.error("--json_dir is required when source=json")
+        
+        total_objects, total_tracking_rows = process_vehicle_data_from_json(
+            args.json_dir, 
+            args.output_dir, 
+            args.data_name
+        )
+        
+    elif args.source == "mongodb":
+        # MongoDB 관련 필수 인자 검증
+        if not args.start_date:
+            parser.error("--start_date is required when source=mongodb")
+        if not args.end_date:
+            parser.error("--end_date is required when source=mongodb")
+        if not args.site_id:
+            parser.error("--site_id is required when source=mongodb")
+        
+        total_objects, total_tracking_rows = process_vehicle_data_from_mongodb(
+            MONGO_URI,
+            args.output_dir,
+            args.data_name,
+            args.start_date,
+            args.end_date,
+            args.site_id
+        )
     
-    try:
-        if args.source == "json":
-            if not args.json_dir:
-                parser.error("--json_dir is required when source=json")
-            
-            total_objects, total_tracking_rows = process_vehicle_data_from_json(
-                args.json_dir, 
-                args.output_dir, 
-                args.data_name
-            )
-            
-        elif args.source == "mongodb":
-            
-            total_objects, total_tracking_rows = process_vehicle_data_from_mongodb(
-                MONGO_URI,
-                args.output_dir,
-                args.data_name,
-                args.start_date,
-                args.end_date,
-                args.site_id
-            )
-        
-        print(f"\n=== Processing Complete ===")
-        print(f"추출된 주행 차량 수: {total_objects}")
-        print(f"주행 메시지 수: {total_tracking_rows}")
-        
-    except Exception as e:
-        print(f"Error during processing: {e}")
-        exit(1)
+    print(f"\n=== Processing Complete ===")
+    print(f"추출된 보행자 수: {total_objects}")
+    print(f"보행자 메시지 수: {total_tracking_rows}")

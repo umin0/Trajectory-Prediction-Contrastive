@@ -470,12 +470,15 @@ if __name__ == "__main__":
                        help="Directory containing JSON files (required when source=json)")
     
     # MongoDB 관련 인자
-    parser.add_argument("--start_date", type=str, 
-                       help="Start date (YYYY-MM-DD format, optional)")
-    parser.add_argument("--end_date", type=str, 
-                       help="End date (YYYY-MM-DD format, optional)")
+    parser.add_argument("--start_date", type=str,
+                       help="Start date (YYYY-MM-DD format)",
+                       required=lambda args: args.source == "mongodb")
+    parser.add_argument("--end_date", type=str,
+                       help="End date (YYYY-MM-DD format)", 
+                       required=lambda args: args.source == "mongodb")
     parser.add_argument("--site_id", type=str, 
-                       help="Site ID filter (optional)")
+                       help="Site ID filter",
+                       required=lambda args: args.source == "mongodb")
     
     args = parser.parse_args()
 

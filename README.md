@@ -24,11 +24,13 @@ MONGO_DATABASE=infra
 MONGO_COLLECTION=log
 ```
 ### 2. 폴더 구조
-aimmo_data_extraction/
-├── .env                    # MongoDB 연결 설정
-├── requirements.txt        # 패키지 목록
-├── preprocess_{class}.py      # class = veh, ped / 클래스 별 추출 스크립트
+```
+aimmo_data_extraction/   
+├── .env                    # MongoDB 연결 설정   
+├── requirements.txt        # 패키지 목록   
+├── preprocess_{class}.py      # class = veh, ped / 클래스 별 추출 스크립트   
 └── README.md              
+```
 
 ## 사용법
 
@@ -54,30 +56,13 @@ python preprocess_veh.py \
 ## 2. MongoDB에서 쿼리를 통한 데이터 처리
 
 ### 기본 사용법
-```bash
-python preprocess_veh.py \
-    --source mongodb \
-    --output_dir /workspace/aimmo_data_extraction/data_extracted \
-    --data_name test
-```
 
-### 날짜 필터링과 함께 사용
-```bash
-python preprocess_veh.py \
-    --source mongodb \
-    --start_date 2024-01-01 \
-    --end_date 2024-01-02 \
-    --output_dir /workspace/aimmo_data_extraction/data_extracted \
-    --data_name test
-```
-
-### 특정 사이트 ID로 필터링
 ```bash
 python preprocess_veh.py \
     --source mongodb \
     --site_id "35310203" \
-    --start_date 2024-01-01 \
-    --end_date 2024-01-02 \
+    --start_date 2025-01-01 \
+    --end_date 2025-01-02 \
     --output_dir /workspace/aimmo_data_extraction/data_extracted \
     --data_name test
 ```
