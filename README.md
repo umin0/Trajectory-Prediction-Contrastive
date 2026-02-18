@@ -24,9 +24,10 @@ Please contact **Bongsob Song** ([bsong@ajou.ac.kr](mailto:bsong@ajou.ac.kr)) 
 # 코드 실행 순서
 
 ##### STEP 1. Data_Extraction
-##### STEP 2. Data_Processing - input
+##### STEP 2. Data_Processing - Input
 ##### STEP 3. QCNet_Contrasive/TUTR_Contrastive
-##### STEP 4. Data_Processing - output
+##### STEP 4. Data_Processing - Output
+##### STEP 5. Evaluation - Collision Probability
 
 ## STEP 1. Data_Extraction
 
@@ -76,7 +77,7 @@ python download.py
    - FrameCount, ObjectID, VehicleClass, DistanceX, DistanceY, Speed, Heading, AccelerationX, AccelerationY
   
 
-## STEP 2. Data_Processing - input
+## STEP 2. Data_Processing - Input
 
 ### 1. Sliding Window 기반 데이터 구성
 
@@ -387,7 +388,7 @@ parser.add_argument("--out_dir", type=str, default="/home/user/Algorithm/QCNet_c
 python test_tutr.py
 ```
 
-## STEP 4. Data_Processing - output
+## STEP 4. Data_Processing - Output
 ### 1. QCNet 추론 결과 처리
 - 모델이 저장한 *.txt 예측 결과를 파싱하여 원본 scenario_*.csv에 pred_x, pred_y 컬럼을 추가합니다.
 - 각 agent(track_id)별로 가장 확률이 높은 모드(Highest-Prob Mode) 를 선택해 예측 궤적을 삽입합니다.
@@ -420,4 +421,26 @@ CONFIGS = [
 - 실행 명령어
 ```bash
 python tutr_ouput_process.py
+```
+
+## STEP 5. Evaluation - Collision Probability
+### Collision Probability (CP) 계산
+- 각 scenario_*.csv 파일에 대해
+  - 예측 궤적(pred_x, pred_y) 기반 CP
+  - GT 궤적(position_x, position_y) 기반 CP
+- 차량 쌍 간 CP를 계산하고
+- scenario별 최대 CP (CP_max) 값을 추출합니다.
+- 경로 설정
+```bash
+path_configs = [
+        (   "/home/user/Algorithm/QCNet_cum/Code/Data_Processing/tutr_output/vanilla", # 입력 데이터 경로
+            "/home/user/Algorithm/QCNet_cum/Code/Data_Processing/tutr_output/vanilla/cp_max"  # 출력 파일 저장 경로
+        )]
+```
+- 파라미터 설정
+```bash
+sigma_x_initial=0.8,
+sigma_y_initial=0.8,
+alpha_x=0.05,
+alpha_y=0.05
 ```
