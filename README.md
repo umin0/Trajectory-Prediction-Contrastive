@@ -444,3 +444,19 @@ sigma_y_initial=0.8,
 alpha_x=0.05,
 alpha_y=0.05
 ```
+- cp max 계산 실행 명령어
+```bash
+python calculate_cp_max.py
+```
+
+### Collision Probability (CP) 평가
+- 전체 데이터에서 gt_cp_max의 최대값을 구하고 그 값보다 더 큰 pred_cp_max가 몇 개인지 계산합니다.
+- 모델이 GT에서 발생한 최대 위험보다 더 과도하게 위험을 예측한 비율을 측정합니다.
+- 경로 설정
+```bash
+csv_path = "K:/final/TEST_OUTPUT/QCNet/contrastive/cp_final_gt/cp_results_separated_heading_prob.csv"
+```
+- cp max 평가 실행 명령어
+```bash
+python eval_cp_max.py
+```
