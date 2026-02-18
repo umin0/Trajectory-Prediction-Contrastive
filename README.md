@@ -21,81 +21,297 @@ See the [paper](https://openaccess.thecvf.com/content/ICCV2023/papers/Shi_Trajec
 Please contact **Bongsob Song** ([bsong@ajou.ac.kr](mailto:bsong@ajou.ac.kr)) if you have any questions.
 
 
-# LIS data extraction for QCNet training
+# 코드 실행 순서
 
+1. Data_Extraction
+2. Data_Processing
+3. QCNet_Contrasive/TUTR_Contrastive
 
-## 설치
+## Data_Extraction
 
 ### 1. 환경 설정
 - 패키지 설치
 ```bash
 pip install -r requirements.txt
 ```
-or
-```bash
-pip install pandas numpy pymongo tqdm python-dateutil python-dotenv pyarrow dnspython
-```
 
-- (mongoDB 접속 시) 환경변수 설정
-1. .env 파일 설정
+- mongoDB 접속 시 .env 파일 환경변수 설정
 ```
 # MongoDB Connection Settings
 MONGO_URI={접속 uri}
 MONGO_DATABASE=infra
 MONGO_COLLECTION=log
 ```
-### 2. 폴더 구조
-```
-aimmo_data_extraction/   
-├── .env                    # MongoDB 연결 설정   
-├── requirements.txt        # 패키지 목록   
-├── preprocess_{class}.py      # class = veh, ped / 클래스 별 추출 스크립트   
-└── README.md              
-```
+### 2. 실행
 
-## 사용법
-
-### JSON 파일에서 데이터 처리
-
+- 데이터 다운로드를 위한 설정
+- LIS SITE MAP 설정 
 ```bash
-python preprocess_veh.py \
-    --source json \
-    --json_dir /path/to/json/files \
-    --output_dir /path/to/output \
-    --data_name my_dataset
+SITE_MAP = {
+    # "36320203": "ny", #남양읍
+    "35310203": "ss", #새솔동
+}
 ```
-
-### 예시
+- 출력 경로 설정 
 ```bash
-python preprocess_veh.py \
-    --source json \
-    --json_dir /data_sample \
-    --output_dir /data_sample \
-    --data_name test
+OUTPUT_DIR = Path("./workspace")
 ```
-
-## 2. MongoDB에서 쿼리를 통한 데이터 처리
-
-### 기본 사용법
-
+- 날짜 설정 
 ```bash
-python preprocess_veh.py \
-    --source mongodb \
-    --site_id "35310203" \
-    --start_date 2025-01-01 \
-    --end_date 2025-01-02 \
-    --output_dir /data_extracted \
-    --data_name test
+START_Y, START_M = 2025, 7
+END_Y,   END_M   = 2025, 7
+```
+- 터미널을 통한 다운로드 실행 명령어
+```bash
+python download.py
 ```
 
-## 3. 출력 파일
+### 3. 출력 파일
 
 1. `{data_name}_object.csv`: 객체 정보
    - ObjectID, SourceID, EquipmentType, ObjectType, VehicleWidth, VehicleLength, StartDate
 
 2. `{data_name}_track.csv`: 트래킹 정보
    - FrameCount, ObjectID, VehicleClass, DistanceX, DistanceY, Speed, Heading, AccelerationX, AccelerationY
+  
 
-## 4. QCNet 학습용 변환
+## Data_Processing
 
-- lis2av2/script.sh 스크립트 활용
+### 1. Sliding Window 기반 데이터 구성
+
+- 입력 / 출력 경로 설정
+```bash
+ROOT_DIR = "/home/user/Algorithm/QCNet_cum/Code/aimmo_data_extraction/workspace"
+OUT_ROOT = "/home/user/Algorithm/QCNet_cum/Code/data_code/data"
+```
+
+- 슬라이딩 윈도우 설정
+```bash
+INPUT_FRAME  = 10     # 관측 길이
+OUTPUT_FRAME = 30     # 예측 길이
+WINDOW_STEP  = 10     # 슬라이딩 간격
+MIN_AGENTS   = 2      # 최소 차량 수
+```
+
+- 정지 차량 제거 임계값 설정
+```bash
+STATIONARY_THRESH = 0.05
+```
+
+- 터미널을 통한 변환 실행 명령어
+```bash
+python preprocessing_lis_sliding.py
+```
+
+### 2. 데이터셋 분할 (TRAIN / VAL / TEST)
+
+- 입력 / 출력 경로 설정
+```bash
+src_root = "/home/user/Algorithm/QCNet_cum/Code/data_code/data"
+dst_root = "/home/user/Algorithm/QCNet_cum/Code/data_code/data/split"
+```
+- 분할 비율 설정
+```bash
+train_ratio = 0.4
+val_ratio   = 0.1
+test_ratio  = 0.5
+```
+- 터미널을 통한 데이터 분할 실행 명령어
+```bash
+python selecting_train_val_test_data.py
+```
+
+- 출력 폴더 구조
+ ```bash
+split/
+ ├── TRAIN/
+ ├── VAL/
+ └── TEST/
+```
+
+## 3. 학습데이터 포맷 변환 
+### 3-1. QCNet 학습용 포맷 변환
+- 입력 / 출력 경로 설정
+```bash
+source_root = "/home/user/Algorithm/QCNet_cum/Code/data_code/data/split"
+output_root = "/home/user/Algorithm/QCNet_cum/Code/data_code/data/qcnet_data"
+json_source_file = "/home/user/Algorithm/QCNet_cum/Code/data_code/SS_map.json"
+```
+- 터미널을 통한 변환 실행 명령어
+```bash
+python convert_lis2argoverse2.py
+```
+- 출력 구조
+```bash
+qcnet_data/
+ ├── train/
+ │    └── raw/
+ │         └── <scenario_id>/
+ │              ├── scenario_<scenario_id>.parquet
+ │              └── log_map_archive_<scenario_id>.json
+ ├── val/
+ │    └── raw/
+ │         └── <scenario_id>/
+ │              ├── scenario_<scenario_id>.parquet
+ │              └── log_map_archive_<scenario_id>.json
+ └── test/
+      └── raw/
+           └── <scenario_id>/
+                ├── scenario_<scenario_id>.parquet
+                └── log_map_archive_<scenario_id>.json
+```
+### 3-2. TUTR 학습용 포맷 변환
+- 입력 / 출력 경로 설정
+```bash
+SRC_ROOT = "/home/user/Algorithm/QCNet_cum/Code/data_code/data/split"
+DST_ROOT = "/home/user/Algorithm/QCNet_cum/Code/data_code/data/tutr_data"
+```
+- 터미널을 통한 변환 실행 명령어
+```bash
+python convert_lis2tutr.py
+```
+- 출력 폴더 구조
+```bash
+tutr_data/
+ ├── TRAIN/
+ │    └── scenario_<scenario_id>.csv
+ ├── VAL/
+ │    └── scenario_<scenario_id>.csv
+ └── TEST/
+      └── scenario_<scenario_id>.csv
+```
+
+## QCNet_Contrasive
+### 1. 모델 학습
+#### 1-1. Vanilla 학습
+- 파라미터 설정
+ ```bash
+    args = parser.parse_args([
+        '--root',                   '/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/Data/LIS', # 데이터 경로 설정
+        '--train_batch_size',       '16', # 배치 사이즈 설정
+        '--val_batch_size',         '16', # 배치 사이즈 설정
+        '--test_batch_size',        '16', # 배치 사이즈 설정
+        '--devices',                '6',  # 디바이스(GPU) 설정
+        '--dataset',                'argoverse_v2_ACL',
+        '--num_historical_steps',   '10', # 입력 시퀀스 길이 설정
+        '--num_future_steps',       '30', # 출력 시퀀스 길이 설정
+        # 공간 반경(Interaction Radius) 설정(원문 논문과 동일)
+        '--num_recurrent_steps',    '3', 
+        '--pl2pl_radius',           '150',
+        '--time_span',              '10',
+        '--pl2a_radius',            '50',
+        '--a2a_radius',             '50',
+        '--num_t2m_steps',          '30',
+        '--pl2m_radius',            '150',
+        '--a2m_radius',             '150'
+    ])
+  ```
+- 학습 실행 명령어
+```bash
+python train_qcnet.py
+```
+- Note 1: 처음으로 학습 스크립트를 실행할 경우, 데이터 전처리 과정에 몇 시간이 소요될 수 있습니다.
+- Note 2: 학습 중 생성되는 체크포인트는 자동으로 lightning_logs/ 폴더에 저장됩니다.
+
+#### 1-2. Contrastive learning 학습
+- 파라미터 설정
+ ```bash
+    args = parser.parse_args([
+        '--root',                   '/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/Data/LIS', # 데이터 경로 설정
+        '--train_batch_size',       '16', # 배치 사이즈 설정
+        '--val_batch_size',         '16', # 배치 사이즈 설정
+        '--test_batch_size',        '16', # 배치 사이즈 설정
+        '--devices',                '6',  # 디바이스(GPU) 설정
+        '--dataset',                'argoverse_v2_ACL',
+        '--num_historical_steps',   '10', # 입력 시퀀스 길이 설정
+        '--num_future_steps',       '30', # 출력 시퀀스 길이 설정
+        # 공간 반경(Interaction Radius) 설정(원문 논문과 동일)
+        '--num_recurrent_steps',    '3', 
+        '--pl2pl_radius',           '150',
+        '--time_span',              '10',
+        '--pl2a_radius',            '50',
+        '--a2a_radius',             '50',
+        '--num_t2m_steps',          '30',
+        '--pl2m_radius',            '150',
+        '--a2m_radius',             '150'
+        # Contrastive learning 파라미터
+        '--lambda_contrastive',     '1',
+        '--tau',                    '0.5',
+        '--theta_p',                '0.33',
+        '--theta_n',                '0.50',
+    ])
+  ```
+- 학습 실행 명령어
+```bash
+python train_qcnet_contrastive.py
+```
+- Note 1: 처음으로 학습 스크립트를 실행할 경우, 데이터 전처리 과정에 몇 시간이 소요될 수 있습니다.
+- Note 2: 학습 중 생성되는 체크포인트는 자동으로 lightning_logs/ 폴더에 저장됩니다.
+  
+#### 1-3. CP Contrastive learning 학습
+- 파라미터 설정
+ ```bash
+    args = parser.parse_args([
+        '--root',                   '/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/Data/LIS', # 데이터 경로 설정
+        '--train_batch_size',       '16', # 배치 사이즈 설정
+        '--val_batch_size',         '16', # 배치 사이즈 설정
+        '--test_batch_size',        '16', # 배치 사이즈 설정
+        '--devices',                '6',  # 디바이스(GPU) 설정
+        '--dataset',                'argoverse_v2_ACL',
+        '--num_historical_steps',   '10', # 입력 시퀀스 길이 설정
+        '--num_future_steps',       '30', # 출력 시퀀스 길이 설정
+        # 공간 반경(Interaction Radius) 설정(원문 논문과 동일)
+        '--num_recurrent_steps',    '3', 
+        '--pl2pl_radius',           '150',
+        '--time_span',              '10',
+        '--pl2a_radius',            '50',
+        '--a2a_radius',             '50',
+        '--num_t2m_steps',          '30',
+        '--pl2m_radius',            '150',
+        '--a2m_radius',             '150'
+        # Contrastive learning 파라미터
+        '--lambda_contrastive',     '1',
+        '--tau',                    '0.5',
+        '--theta_p',                '0.33',
+        '--theta_n',                '0.50',
+    ])
+  ```
+- 학습 실행 명령어
+```bash
+python train_qcnet_contrastive_cp.py
+```
+- Note 1: 처음으로 학습 스크립트를 실행할 경우, 데이터 전처리 과정에 몇 시간이 소요될 수 있습니다.
+- Note 2: 학습 중 생성되는 체크포인트는 자동으로 lightning_logs/ 폴더에 저장됩니다.
+
+### 2. 모델 평가  
+
+- 저장된 체크포인트(.ckpt)를 로드해서 TEST split에서 trainer.validate()로 성능을 평가합니다.
+- 파라미터 설정
+ ```bash
+ args = parser.parse_args([
+        '--model',      'QCNet', 
+        '--root', '/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/Data',  # 데이터 경로 설정
+        '--ckpt_path','/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/lightning_logs/Vanilla/checkpoints/epoch=70-step=7100.ckpt' # 체크포인트 경로 설정
+    ])
+ ```
+- 평가 실행 명령어
+```bash
+python val_qcnet.py
+```
+### 3. 모델 추론 및 예측 결과 저장  
+
+- 저장된 체크포인트(.ckpt)를 로드하여 TEST 데이터에 대해 추론을 수행합니다.
+- 모델의 예측 결과는 --save_dir 경로에 저장됩니다.
+- 파라미터 설정
+ ```bash
+ args = parser.parse_args([
+        '--model',      'QCNet', 
+        '--root', '/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/Data',  # 데이터 경로 설정
+        '--ckpt_path','/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/lightning_logs/Vanilla/checkpoints/epoch=70-step=7100.ckpt' # 체크포인트 경로 설정
+        '--save_dir', '/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/output' # 추론 결과 저장 경로 설정
+    ])
+ ```
+- 추론 실행 명령어
+```bash
+python test_qcnet.py
+```
