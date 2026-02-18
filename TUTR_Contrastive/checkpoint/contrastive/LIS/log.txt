@@ -1,0 +1,65 @@
+
+
+===== TRAINING STARTED: 2026-02-18 18:28:17 =====
+Namespace(dataset_path='./dataset/', dataset_name='LIS', hp_config='config/ig_contrastive.py', lr_scaling=False, num_works=2, obs_len=10, pred_len=30, seed=1, gpu='0', data_scaling=[1.9, 0.4], checkpoint='./checkpoint/contrastive', search=False, search_epochs=80, search_patience=15)
+Loaded hp_config from: config/ig_contrastive.py
+Initial hp_config: lr=0.0001, batch_size=1024, n_clusters=200
+Traceback (most recent call last):
+  File "/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/train_tutr_contrastive.py", line 573, in <module>
+    best_metric_full, best_details = run_training(
+  File "/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/train_tutr_contrastive.py", line 449, in run_training
+    train_loader, test_loader = build_dataloaders(hp_config, args)
+  File "/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/train_tutr_contrastive.py", line 166, in build_dataloaders
+    train_dataset = TrajectoryDataset(
+  File "/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/utils/dataset.py", line 22, in __init__
+    f = open(dataset_path + dataset_name + '_' + dataset_type + '.pkl', 'rb+')
+FileNotFoundError: [Errno 2] No such file or directory: './dataset/LIS_train.pkl'
+
+
+===== TRAINING STARTED: 2026-02-18 18:30:03 =====
+Namespace(dataset_path='./dataset/', dataset_name='LIS', hp_config='config/ig_contrastive.py', lr_scaling=False, num_works=2, obs_len=10, pred_len=30, seed=1, gpu='0', data_scaling=[1.9, 0.4], checkpoint='./checkpoint/contrastive', search=False, search_epochs=80, search_patience=15)
+Loaded hp_config from: config/ig_contrastive.py
+Initial hp_config: lr=0.0001, batch_size=1024, n_clusters=200
+[n_clusters=200] motion modes generating ...
+/home/user/anaconda3/envs/TUTR/lib/python3.10/site-packages/sklearn/cluster/_kmeans.py:870: FutureWarning: The default value of `n_init` will change from 10 to 'auto' in 1.4. Set the value of `n_init` explicitly to suppress the warning
+  warnings.warn(
+Finished
+==> Training with config:
+  lr=0.0001
+  batch_size=1024
+  n_clusters=200
+  epochs=1000
+  lambda_contr=0.5
+  contr_tau=0.5
+  contr_pos_delta=0.33
+  contr_neg_delta=0.33
+ADE: 10.0143 | FDE: 19.5481 | RMSE_X: 10.5514 | RMSE_Y: 1.0954 | Infer: 0.19s | 0.04 ms/sample
+[Epoch 0] -> best.pth updated (ADE+FDE improved)
+[Epoch 000] Loss: 9.5348 | ADE: 10.0143 | FDE: 19.5481 | RMSE_X: 10.5514 | RMSE_Y: 1.0954 | Infer: 0.19s | 0.04 ms/sample
+ADE: 9.4874 | FDE: 18.6760 | RMSE_X: 10.1571 | RMSE_Y: 1.0461 | Infer: 0.19s | 0.04 ms/sample
+[Epoch 1] -> best.pth updated (ADE+FDE improved)
+[Epoch 001] Loss: 8.4064 | ADE: 9.4874 | FDE: 18.6760 | RMSE_X: 10.1571 | RMSE_Y: 1.0461 | Infer: 0.19s | 0.04 ms/sample
+reg: 4.2749, cls: 3.4449, contr: 0.0361, total: 7.7379
+ADE: 9.0439 | FDE: 18.2515 | RMSE_X: 9.8889 | RMSE_Y: 1.0317 | Infer: 0.19s | 0.04 ms/sample
+[Epoch 2] -> best.pth updated (ADE+FDE improved)
+[Epoch 002] Loss: 7.7470 | ADE: 9.0439 | FDE: 18.2515 | RMSE_X: 9.8889 | RMSE_Y: 1.0317 | Infer: 0.19s | 0.04 ms/sample
+reg: 4.1807, cls: 3.1054, contr: 0.0425, total: 7.3074
+ADE: 8.8144 | FDE: 17.9969 | RMSE_X: 9.6492 | RMSE_Y: 1.0310 | Infer: 0.19s | 0.04 ms/sample
+[Epoch 3] -> best.pth updated (ADE+FDE improved)
+[Epoch 003] Loss: 7.2340 | ADE: 8.8144 | FDE: 17.9969 | RMSE_X: 9.6492 | RMSE_Y: 1.0310 | Infer: 0.19s | 0.04 ms/sample
+ADE: 8.5351 | FDE: 17.6493 | RMSE_X: 9.3923 | RMSE_Y: 1.0128 | Infer: 0.19s | 0.04 ms/sample
+[Epoch 4] -> best.pth updated (ADE+FDE improved)
+[Epoch 004] Loss: 6.9512 | ADE: 8.5351 | FDE: 17.6493 | RMSE_X: 9.3923 | RMSE_Y: 1.0128 | Infer: 0.19s | 0.04 ms/sample
+Traceback (most recent call last):
+  File "/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/train_tutr_contrastive.py", line 573, in <module>
+    max_epochs=None,
+  File "/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/train_tutr_contrastive.py", line 477, in run_training
+    
+  File "/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/train_tutr_contrastive.py", line 326, in train_one_epoch
+    optimizer.zero_grad()
+  File "/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/train_tutr_contrastive.py", line 299, in compute_kf_difficulty
+    kf.update(xy[t])
+  File "/home/user/anaconda3/envs/TUTR/lib/python3.10/site-packages/filterpy/kalman/kalman_filter.py", line 484, in predict
+    self.P = self._alpha_sq * dot(dot(F, self.P), F.T) + Q
+  File "<__array_function__ internals>", line 177, in dot
+KeyboardInterrupt
