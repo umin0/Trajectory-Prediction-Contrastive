@@ -241,45 +241,16 @@ python train_qcnet.py
         '--theta_n',                '0.50',
     ])
   ```
-- 학습 실행 명령어
+- Contrastive Learning 학습 실행 명령어
 ```bash
 python train_qcnet_contrastive.py
 ```
-- Note 1: 처음으로 학습 스크립트를 실행할 경우, 데이터 전처리 과정에 몇 시간이 소요될 수 있습니다.
-- Note 2: 학습 중 생성되는 체크포인트는 자동으로 lightning_logs/ 폴더에 저장됩니다.
-  
-#### 1-3. CP Contrastive learning 학습
-- 파라미터 설정
- ```bash
-    args = parser.parse_args([
-        '--root',                   '/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/Data/LIS', # 데이터 경로 설정
-        '--train_batch_size',       '16', # 배치 사이즈 설정
-        '--val_batch_size',         '16', # 배치 사이즈 설정
-        '--test_batch_size',        '16', # 배치 사이즈 설정
-        '--devices',                '6',  # 디바이스(GPU) 설정
-        '--dataset',                'argoverse_v2_ACL',
-        '--num_historical_steps',   '10', # 입력 시퀀스 길이 설정
-        '--num_future_steps',       '30', # 출력 시퀀스 길이 설정
-        # 공간 반경(Interaction Radius) 설정(원문 논문과 동일)
-        '--num_recurrent_steps',    '3', 
-        '--pl2pl_radius',           '150',
-        '--time_span',              '10',
-        '--pl2a_radius',            '50',
-        '--a2a_radius',             '50',
-        '--num_t2m_steps',          '30',
-        '--pl2m_radius',            '150',
-        '--a2m_radius',             '150'
-        # Contrastive learning 파라미터
-        '--lambda_contrastive',     '1',
-        '--tau',                    '0.5',
-        '--theta_p',                '0.33',
-        '--theta_n',                '0.50',
-    ])
-  ```
-- 학습 실행 명령어
+OR
+- CP기반 Contrastive Learning 학습할 경우, 
 ```bash
 python train_qcnet_contrastive_cp.py
 ```
+
 - Note 1: 처음으로 학습 스크립트를 실행할 경우, 데이터 전처리 과정에 몇 시간이 소요될 수 있습니다.
 - Note 2: 학습 중 생성되는 체크포인트는 자동으로 lightning_logs/ 폴더에 저장됩니다.
 
@@ -315,3 +286,13 @@ python val_qcnet.py
 ```bash
 python test_qcnet.py
 ```
+
+## TUTR_Contrasive
+### 1. 입력 데이터 전처리
+- 파라미터 설정
+
+
+### 1. 모델 학습
+#### 1-1. Vanilla 학습
+- 파라미터 설정
+ ```bash
