@@ -290,9 +290,100 @@ python test_qcnet.py
 ## TUTR_Contrasive
 ### 1. 입력 데이터 전처리
 - 파라미터 설정
+```bash
+parser.add_argument("--data_root", type=str, default='./data/LIS') # 데이터 경로 설정
+parser.add_argument("--config", type=str, default='config/ig.py') # Config 파일 지정
+```
+- 전처리 실행 명령어
+```bash
+python get_data_pkl.py
+```
 
-
-### 1. 모델 학습
-#### 1-1. Vanilla 학습
+### 2. 모델 학습
+#### 2-1. Vanilla 학습
 - 파라미터 설정
- ```bash
+```bash
+parser.add_argument('--dataset_path', type=str, default='./dataset/') # 데이터 경로 설정
+parser.add_argument('--dataset_name', type=str, default='LIS') # 데이터명 설정
+parser.add_argument("--hp_config", type=str, default='config/ig.py', help='hyper-parameter') # Config 파일 지정
+parser.add_argument('--lr_scaling', action='store_true', default=False)
+parser.add_argument('--num_works', type=int, default=2)
+parser.add_argument('--obs_len', type=int, default=10) # 입력 시퀀스 길이 설정
+parser.add_argument('--pred_len', type=int, default=30) # 출력 시퀀스 길이 설정
+parser.add_argument('--seed', type=int, default=1)
+parser.add_argument('--gpu', type=str, default='0') # 디바이스(GPU) 설정
+parser.add_argument('--data_scaling', type=list, default=[1.9, 0.4])
+parser.add_argument('--checkpoint', type=str, default='./checkpoint/vanilla') # 체크포인트 저장 경로 설정
+```
+- 학습 실행 명령어
+```bash
+python train_tutr.py
+```
+
+#### 2-2. Contrastive Learning 학습
+
+- config 파일 파라미터 설정(config/ig_contrastive.py)
+```bash
+lambda_contr = 0.5      # λ
+contr_tau = 0.5      # τ
+contr_pos_delta = 0.33   # θ_p
+contr_neg_delta = 0.33   # θ_n
+```
+- 파라미터 설정
+```bash
+parser.add_argument('--dataset_path', type=str, default='./dataset/') # 데이터 경로 설정
+parser.add_argument('--dataset_name', type=str, default='LIS') # 데이터명 설정
+parser.add_argument("--hp_config", type=str, default='config/ig_contrastive.py', help='hyper-parameter') # Config 파일 지정
+parser.add_argument('--obs_len', type=int, default=10) # 입력 시퀀스 길이 설정
+parser.add_argument('--pred_len', type=int, default=30) # 출력 시퀀스 길이 설정
+parser.add_argument('--gpu', type=str, default='0') # 디바이스(GPU) 설정
+parser.add_argument('--checkpoint', type=str, default='./checkpoint/vanilla') # 체크포인트 저장 경로 설정
+```
+
+- Contrastive Learning 학습 실행 명령어
+```bash
+python train_tutr_contrastive.py
+```
+OR
+- CP기반 Contrastive Learning 학습할 경우, 
+```bash
+python train_tutr_contrastive_cp.py
+```
+
+
+### 3. 모델 평가
+- 저장된 체크포인트(.pth)를 로드해서 TEST 데이터에 대해 성능을 평가합니다.
+- 파라미터 설정
+```bash
+parser.add_argument('--dataset_path', type=str, default='./dataset/') # 데이터 경로 설정
+parser.add_argument('--dataset_name', type=str, default='sliding_window_10') # 데이터명 설정
+parser.add_argument("--hp_config", type=str, default="./config/ig.py") # Config 파일 지정
+parser.add_argument("--checkpoint",type=str,default="/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/checkpoint/vanilla") # 체크포인트 경로 설정
+parser.add_argument('--obs_len', type=int, default=10) # 입력 시퀀스 길이 설정
+parser.add_argument('--pred_len', type=int, default=30) # 출력 시퀀스 길이 설정
+```
+
+- 평가 실행 명령어
+```bash
+python val_tutr.py
+```
+
+### 4. 모델 추론 및 예측 결과 저장  
+- 저장된 체크포인트(.pth)를 로드하여 TEST 데이터에 대해 추론을 수행합니다.
+- 모델의 예측 결과는 --out_dir 경로에 저장됩니다.
+- 파라미터 설정
+```bash
+ parser.add_argument("--obs_len", type=int, default=10) # 입력 시퀀스 길이 설정
+parser.add_argument("--pred_len", type=int, default=30) # 출력 시퀀스 길이 설정
+parser.add_argument("--hp_config", type=str, default="./config/ig.py") # Config 파일 지정
+parser.add_argument("--csv_path", type=str,  default="/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/data/LIS/TEST") # 테스트 데이터 경로 설정
+parser.add_argument("--checkpoint",type=str,default="/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/checkpoint/vanilla/sliding_window_10/best.pth") # 체크포인트 경로 설정
+parser.add_argument("--motion_modes_path",type=str,default="/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/dataset/sliding_window_10_motion_modes_200.pkl") # 모션모드 경로 설정
+parser.add_argument("--out_dir", type=str, default="/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/output/vanilla") # 추론 결과 저장 경로 설정
+ ```
+- 추론 실행 명령어
+```bash
+python test_tutr.py
+```
+
+
