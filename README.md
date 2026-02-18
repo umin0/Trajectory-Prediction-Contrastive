@@ -1,7 +1,28 @@
+# Trajectory Prediction Contrastive Learning
+
+***Vehicle Intelligence and Control Lab, Ajou University***
+
+---
+
+This codebase implements the system described in the paper:
+
+**Query-centric trajectory prediction**
+
+Zikang Zhou, Jianping Wang, et al. Published in *Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), 2023*.
+
+See the [paper](https://openaccess.thecvf.com/content/CVPR2023/papers/Zhou_Query-Centric_Trajectory_Prediction_CVPR_2023_paper.pdf) for more details.
+
+**Trajectory Unified Transformer for Pedestrian Trajectory Prediction**
+
+Lei Shi, Lijun Wang, Shuo Zhou, and Gang Hua. Published in *Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV), 2023*.
+
+See the [paper](https://openaccess.thecvf.com/content/ICCV2023/papers/Shi_Trajectory_Unified_Transformer_for_Pedestrian_Trajectory_Prediction_ICCV_2023_paper.pdf) for more details.
+
+Please contact **Bongsob Song** ([bsong@ajou.ac.kr](mailto:bsong@ajou.ac.kr)) if you have any questions.
+
+
 # LIS data extraction for QCNet training
 
-## version
-- 2025.08.01 ver 1.0
 
 ## 설치
 
