@@ -40,7 +40,7 @@ pip install -r requirements.txt
 - mongoDB 접속 시 .env 파일 환경변수 설정
 ```
 # MongoDB Connection Settings
-MONGO_URI={접속 uri}
+MONGO_URI=mongodb://nas-15.bluewhale.kr/
 MONGO_DATABASE=infra
 MONGO_COLLECTION=log
 ```
