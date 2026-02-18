@@ -23,9 +23,9 @@ Please contact **Bongsob Song** ([bsong@ajou.ac.kr](mailto:bsong@ajou.ac.kr)) 
 
 # 코드 실행 순서
 
-STEP 1. Data_Extraction
-STEP 2. Data_Processing
-STEP 3. QCNet_Contrasive/TUTR_Contrastive
+##### STEP 1. Data_Extraction
+##### STEP 2. Data_Processing
+##### STEP 3. QCNet_Contrasive/TUTR_Contrastive
 
 ## STEP 1. Data_Extraction
 
