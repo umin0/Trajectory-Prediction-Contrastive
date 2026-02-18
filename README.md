@@ -24,8 +24,9 @@ Please contact **Bongsob Song** ([bsong@ajou.ac.kr](mailto:bsong@ajou.ac.kr)) 
 # 코드 실행 순서
 
 ##### STEP 1. Data_Extraction
-##### STEP 2. Data_Processing
+##### STEP 2. Data_Processing - input
 ##### STEP 3. QCNet_Contrasive/TUTR_Contrastive
+##### STEP 4. Data_Processing - output
 
 ## STEP 1. Data_Extraction
 
@@ -75,7 +76,7 @@ python download.py
    - FrameCount, ObjectID, VehicleClass, DistanceX, DistanceY, Speed, Heading, AccelerationX, AccelerationY
   
 
-## STEP 2. Data_Processing
+## STEP 2. Data_Processing - input
 
 ### 1. Sliding Window 기반 데이터 구성
 
@@ -129,8 +130,8 @@ split/
  └── TEST/
 ```
 
-## 3. 학습데이터 포맷 변환 
-### 3-1. QCNet 학습용 포맷 변환
+### 3. 학습데이터 포맷 변환 
+#### 3-1. QCNet 학습용 포맷 변환
 - 입력 / 출력 경로 설정
 ```bash
 source_root = "/home/user/Algorithm/QCNet_cum/Code/data_code/data/split"
@@ -160,7 +161,7 @@ qcnet_data/
                 ├── scenario_<scenario_id>.parquet
                 └── log_map_archive_<scenario_id>.json
 ```
-### 3-2. TUTR 학습용 포맷 변환
+#### 3-2. TUTR 학습용 포맷 변환
 - 입력 / 출력 경로 설정
 ```bash
 SRC_ROOT = "/home/user/Algorithm/QCNet_cum/Code/data_code/data/split"
@@ -373,7 +374,7 @@ python val_tutr.py
 - 모델의 예측 결과는 --out_dir 경로에 저장됩니다.
 - 파라미터 설정
 ```bash
- parser.add_argument("--obs_len", type=int, default=10) # 입력 시퀀스 길이 설정
+parser.add_argument("--obs_len", type=int, default=10) # 입력 시퀀스 길이 설정
 parser.add_argument("--pred_len", type=int, default=30) # 출력 시퀀스 길이 설정
 parser.add_argument("--hp_config", type=str, default="./config/ig.py") # Config 파일 지정
 parser.add_argument("--csv_path", type=str,  default="/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/data/LIS/TEST") # 테스트 데이터 경로 설정
@@ -386,4 +387,37 @@ parser.add_argument("--out_dir", type=str, default="/home/user/Algorithm/QCNet_c
 python test_tutr.py
 ```
 
+## STEP 4. Data_Processing - output
+### 1. QCNet 추론 결과 처리
+- 모델이 저장한 *.txt 예측 결과를 파싱하여 원본 scenario_*.csv에 pred_x, pred_y 컬럼을 추가합니다.
+- 각 agent(track_id)별로 가장 확률이 높은 모드(Highest-Prob Mode) 를 선택해 예측 궤적을 삽입합니다.
+- 결과 CSV는 OUT_DIR에 저장됩니다.
+- 경로 설정
+```bash
+CONFIGS = [
+        {   "CSV_DIR": "/home/user/Algorithm/QCNet_cum/Code/Data", #입력 CSV 경로 설정
+            "TXT_DIR": r"/home/user/Algorithm/QCNet_cum/Code/QCNet_Contrasive/output", # 입력 TXT 경로 설정 (QCNet모델이 저장한 예측 결과 txt)
+            "OUT_DIR": "/home/user/Algorithm/QCNet_cum/Code/Data_Processing/qcnet_output/vanilla", # 출력 경로 설정
+        }]
+```
+- 실행 명령어
+```bash
+python qcnet_ouput_process.py
+```
 
+### 2. TUTR 추론 결과 처리
+- TUTR에서 생성된 예측 결과(pred_x/pred_y)를 Argoverse2 포맷 scenario_*.csv에 병합합니다.
+- track_id + frame_id 기준으로 join하여 예측 컬럼을 원본 CSV에 추가합니다.
+- 결과는 out_root에 동일한 파일명으로 저장됩니다.
+- 경로 설정
+```bash
+CONFIGS = [
+    {   "csv_root": "/home/user/Algorithm/QCNet_cum/Code/Data",  #입력 CSV 경로 설정
+        "tutr_root": "/home/user/Algorithm/QCNet_cum/Code/TUTR_Contrastive/output/vanilla", # 입력 csv 경로 설정 (TUTR모델이 저장한 예측 결과 csv)
+        "out_root": "/home/user/Algorithm/QCNet_cum/Code/Data_Processing/tutr_output/vanilla", # 출력 경로 설정
+    }]
+```
+- 실행 명령어
+```bash
+python tutr_ouput_process.py
+```
