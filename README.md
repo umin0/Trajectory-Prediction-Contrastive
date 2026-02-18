@@ -23,11 +23,11 @@ Please contact **Bongsob Song** ([bsong@ajou.ac.kr](mailto:bsong@ajou.ac.kr)) 
 
 # 코드 실행 순서
 
-1. Data_Extraction
-2. Data_Processing
-3. QCNet_Contrasive/TUTR_Contrastive
+STEP 1. Data_Extraction
+STEP 2. Data_Processing
+STEP 3. QCNet_Contrasive/TUTR_Contrastive
 
-## Data_Extraction
+## STEP 1. Data_Extraction
 
 ### 1. 환경 설정
 - 패키지 설치
@@ -75,7 +75,7 @@ python download.py
    - FrameCount, ObjectID, VehicleClass, DistanceX, DistanceY, Speed, Heading, AccelerationX, AccelerationY
   
 
-## Data_Processing
+## STEP 2. Data_Processing
 
 ### 1. Sliding Window 기반 데이터 구성
 
@@ -181,7 +181,7 @@ tutr_data/
       └── scenario_<scenario_id>.csv
 ```
 
-## QCNet_Contrasive
+## STEP 3. QCNet_Contrasive
 ### 1. 모델 학습
 #### 1-1. Vanilla 학습
 - 파라미터 설정
@@ -287,7 +287,7 @@ python val_qcnet.py
 python test_qcnet.py
 ```
 
-## TUTR_Contrasive
+## STEP 3. TUTR_Contrasive
 ### 1. 입력 데이터 전처리
 - 파라미터 설정
 ```bash
